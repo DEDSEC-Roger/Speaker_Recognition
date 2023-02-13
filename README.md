@@ -1,2 +1,2 @@
 # Speaker_Recognition
-Speaker recognize project.
+Speaker recognition project.
