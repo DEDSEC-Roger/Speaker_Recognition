@@ -210,7 +210,7 @@ if "__main__" == __name__:
     feats = fbank_origin(waveforms)
     # feats = fbank(model, waveforms)
     plot(feats.numpy().reshape(feats.shape[0], feats.shape[2], feats.shape[1]),
-         "mel", ["LFBE"])
+         "mel", ["LFBE", "LFBE_2", "LFBE_3"])
 
     # for infer time testing
     # number = 10
