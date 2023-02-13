@@ -68,7 +68,7 @@ def profile_test(model: Model,
 
 if "__main__" == __name__:
     sample_rate = 16000
-    modelname = "ECAPA_TDNN_GLOB_c512-ASTP-emb192-ArcMargin-LM"
+    modelname = "voxceleb-resnet34-emb256-LM"
     for config in modelname.split('-'):
         if "emb" in config:
             embeding_size = int(config[3:])
@@ -206,18 +206,18 @@ if "__main__" == __name__:
     # print(timeit(stmt=lambda: fbank(model, waveforms), number=number) / number)
 
     # for fbank testing
-    waveforms = torch.from_numpy(waveforms).to(dtype)
-    feats = fbank_origin(waveforms)
+    # waveforms = torch.from_numpy(waveforms).to(dtype)
+    # feats = fbank_origin(waveforms)
     # feats = fbank(model, waveforms)
-    plot(feats.numpy().reshape(feats.shape[0], feats.shape[2], feats.shape[1]),
-         "mel", ["LFBE", "LFBE_2", "LFBE_3"])
+    # plot(feats.numpy().reshape(feats.shape[0], feats.shape[2], feats.shape[1]),
+    #      "mel", ["LFBE", "LFBE_2", "LFBE_3"])
 
     # for infer time testing
-    # number = 10
-    # print(
-    #     timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
-    #            number=number) / number)
-    # print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
+    number = 10
+    print(
+        timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
+               number=number) / number)
+    print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
     # for infer testing
     # embeddings = infer_origin(model, waveforms, sample_rate)
