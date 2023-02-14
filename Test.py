@@ -3,7 +3,9 @@ import os
 import platform
 from timeit import timeit
 
-if "armv7l" not in platform.platform().split('-'):
+if "armv7l" in platform.platform().split('-'):
+    print("can not perform plotting in this platform")
+else:
     import librosa.display
 
 import matplotlib.pyplot as plt
