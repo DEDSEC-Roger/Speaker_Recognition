@@ -1,4 +1,4 @@
-# import itertools as it
+import itertools as it
 import os
 from timeit import timeit
 
