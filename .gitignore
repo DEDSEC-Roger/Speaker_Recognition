@@ -1,7 +1,7 @@
 # Customization
-Audio/**/*.wav
-Model/**/*.onnx
-Profile/**/*.npy
+Audio/
+Model/
+Profile/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
