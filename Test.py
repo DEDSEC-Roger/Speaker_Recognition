@@ -1,8 +1,11 @@
 import itertools as it
 import os
+import platform
 from timeit import timeit
 
-import librosa.display
+if "armv7l" not in platform.platform().split('-'):
+    import librosa.display
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -68,7 +71,7 @@ def profile_test(model: Model,
 
 if "__main__" == __name__:
     sample_rate = 16000
-    modelname = "voxceleb-resnet34-emb256-LM"
+    modelname = "ECAPA_TDNN_GLOB_c512-ASTP-emb192-ArcMargin-LM"
     for config in modelname.split('-'):
         if "emb" in config:
             embeding_size = int(config[3:])
@@ -213,7 +216,7 @@ if "__main__" == __name__:
     #      "mel", ["LFBE", "LFBE_2", "LFBE_3"])
 
     # for infer time testing
-    number = 10
+    number = 5
     print(
         timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
                number=number) / number)

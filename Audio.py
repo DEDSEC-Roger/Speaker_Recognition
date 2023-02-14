@@ -37,8 +37,8 @@ class Audio(QObject):
         self.sample_rate = 16000
         self.channels = 1
         self.width = 2
-        self.input_index = 1
-        self.output_index = 3
+        self.input_index = 2
+        self.output_index = 2
         self.chunk = self.sample_rate
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(rate=self.sample_rate,
