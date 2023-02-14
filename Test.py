@@ -197,7 +197,7 @@ if "__main__" == __name__:
 
     #     profile_test(model, waveforms, profile, 2, filename.split('.')[0])
 
-    # waveforms = load(r"hzf_enroll.wav", sample_rate)
+    waveforms = load(r"hzf_enroll.wav", sample_rate)
 
     # for fbank time testing
     # waveforms = torch.from_numpy(waveforms).to(dtype)
