@@ -106,7 +106,7 @@ if "__main__" == __name__:
 
         return torch.stack(feats, dim=0)
 
-    def fbank(model: Model, waveforms: torch.tensor):
+    def fbank(model: Model, waveforms: torch.tensor, spectrogram: bool = False):
 
         return model.fbank(waveforms,
                            num_mel_bins=num_mel_bins,
@@ -115,9 +115,19 @@ if "__main__" == __name__:
                            dither=dither,
                            sample_frequency=sample_rate,
                            window_type='hamming',
-                           use_energy=False)
+                           use_energy=False,
+                           spectrogram=spectrogram)
 
-    def plot(signals: np.ndarray, type: str, titles: list = None):
+    def plot(signals: np.ndarray,
+             type: str,
+             titles: list = None,
+             diff_scale=False):
+        """
+        signals: np.ndarray with shape [bs, F, T]
+        type: "waveshow", "linear", "fft", "hz", "log", "mel", chose one
+        titles: determine the number of display
+        diff_scale: if True, plot colorbar for each display
+        """
         assert type in ["waveshow", "linear", "fft", "hz", "log", "mel"]
 
         if titles is not None:
@@ -166,11 +176,13 @@ if "__main__" == __name__:
             for i in range(n_row):
                 temp = helper(signals[i], axs[i], titles[i])
                 value = np.max(signals[i])
-                if value > max_value:
+                if diff_scale:
+                    fig.colorbar(temp, ax=axs[i], format="%+2.f")
+                elif value > max_value:
                     max_value = value
                     img = temp
 
-        if "waveshow" != type:
+        if not diff_scale and "waveshow" != type:
             fig.colorbar(img, ax=axs, format="%+2.f")
 
         plt.show()
@@ -214,15 +226,33 @@ if "__main__" == __name__:
     # waveforms = torch.from_numpy(waveforms).to(dtype)
     # feats = fbank_origin(waveforms)
     # feats = fbank(model, waveforms)
-    # plot(feats.numpy().reshape(feats.shape[0], feats.shape[2], feats.shape[1]),
-    #      "mel", ["LFBE", "LFBE_2", "LFBE_3"])
+    # feats = feats.numpy().reshape(feats.shape[0], feats.shape[2],
+    #                               feats.shape[1])
+    # plot(feats, "mel")
+
+    # for log power spectrogram testing
+    waveforms = torch.from_numpy(waveforms).to(dtype)
+    specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
+    specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
+                                  specs.shape[1])
+    spec_org = kaldi.spectrogram(waveforms,
+                                 raw_energy=False,
+                                 window_type="hanning")
+    spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
+    spec_list = []
+    spec_list.append(specs[0])
+    spec_list.append(spec_org)
+    spec_list = np.stack(spec_list, axis=0)
+    plot(spec_list,
+         "fft", ["Spectrogram", "Spectrogram_Origin"],
+         diff_scale=True)
 
     # for infer time testing
-    number = 5
-    print(
-        timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
-               number=number) / number)
-    print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
+    # number = 5
+    # print(
+    #     timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
+    #            number=number) / number)
+    # print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
     # for infer testing
     # embeddings = infer_origin(model, waveforms, sample_rate)

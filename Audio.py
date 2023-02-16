@@ -1,5 +1,6 @@
 import collections
 import os
+import platform
 import sys
 import typing
 import wave
@@ -37,8 +38,12 @@ class Audio(QObject):
         self.sample_rate = 16000
         self.channels = 1
         self.width = 2
-        self.input_index = 2
-        self.output_index = 2
+        if "armv7l" in platform.platform().split('-'):
+            self.input_index = 2
+            self.output_index = 2
+        else:
+            self.input_index = 1
+            self.output_index = 3
         self.chunk = self.sample_rate
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(rate=self.sample_rate,

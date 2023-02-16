@@ -182,7 +182,8 @@ class Model(QObject):
               vtln_high: float = -500.0,
               vtln_low: float = 100.0,
               vtln_warp: float = 1.0,
-              window_type: str = "povey") -> torch.Tensor:
+              window_type: str = "povey",
+              spectrogram: bool = False) -> torch.Tensor:
         """
         waveform: torch.Tensor of shape [bs, samples]
 
@@ -212,6 +213,9 @@ class Model(QObject):
 
         if use_power:
             spectrum = spectrum.pow(2.0)
+
+        if spectrogram:
+            return spectrum.log()
 
         # size (num_mel_bins, padded_window_size // 2)
         mel_energies = self.mel_energies
