@@ -7,8 +7,8 @@ if "armv7l" in platform.platform().split('-'):
     print("can not perform plotting in this platform")
 else:
     import librosa.display
+    import matplotlib.pyplot as plt
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchaudio.compliance.kaldi as kaldi
@@ -19,6 +19,13 @@ from Profile import Profile
 
 
 def load(file_path: str, sample_rate: int, duration: int = 2):
+    """
+    file_path: str
+    sample_rate: int
+    duration: the duration for each np.array
+
+    return: np.array with shape [bs, sample_rate * duration]
+    """
     waveform = audio.load(file_path)
     length = sample_rate * duration
     waveforms = []
@@ -29,6 +36,13 @@ def load(file_path: str, sample_rate: int, duration: int = 2):
 
 
 def infer_origin(model: Model, waveforms: np.array, sample_rate: int):
+    """
+    model: Model
+    waveforms: np.array with shape [bs, samples]
+    sample_rate: int
+
+    return: embeddings with shape [bs, embedding_size]
+    """
     embeddings = []
     for waveform in waveforms:
         embeddings.append(
@@ -38,24 +52,31 @@ def infer_origin(model: Model, waveforms: np.array, sample_rate: int):
 
 
 def infer(model: Model, waveforms: np.array):
+    """
+    model: Model
+    waveforms: np.array with shape [bs, samples]
+
+    return: embeddings with shape [bs, embedding_size]
+    """
 
     return model.infer(waveforms)
 
 
-def profile_test(model: Model,
-                 waveforms: np.array,
+def profile_test(embeddings: np.array,
                  profile: Profile,
                  mode: int,
                  username: str = None):
     """
-    warning: remember to enroll first, 
-    after the test, delete the enrolled user
+    warning: remember to enroll first, after the test, delete the enrolled user
+    embeddings: np.array with shape [bs, embedding_size]
+    profile: Profile
+    mode: int
+    username: str
     mode: 0 for recognize, 1 for enroll, 2 for delete, 
     """
     assert mode in [0, 1, 2]
     assert 0 == mode or username is not None
 
-    embeddings = infer(model, waveforms)
     if 0 == mode:
         user_score_sorted = profile.recognize(
             embedding=np.mean(embeddings, axis=0))
@@ -198,21 +219,23 @@ if "__main__" == __name__:
     #         except:
     #             continue
 
-    #         profile_test()
+    #         embeddings = infer(model, waveforms)
+    #         profile_test(embeddings, profile, 2, filename.split('.')[0])
 
     #         break
 
     #         for wav in os.listdir(os.path.join(id_dir, id, video)):
     #             print(wav)
 
-    # for filename in os.listdir("Audio"):
-    #     try:
-    #         file_path = os.path.join("Audio", f"{filename}")
-    #         waveforms = load(file_path, sample_rate)
-    #     except:
-    #         continue
+    for filename in os.listdir("Audio"):
+        try:
+            file_path = os.path.join("Audio", f"{filename}")
+            waveforms = load(file_path, sample_rate)
+        except:
+            continue
 
-    #     profile_test(model, waveforms, profile, 2, filename.split('.')[0])
+        embeddings = infer(model, waveforms)
+        profile_test(embeddings, profile, 2, filename.split('.')[0])
 
     waveforms = load(r"hzf_enroll.wav", sample_rate)
 
@@ -231,21 +254,21 @@ if "__main__" == __name__:
     # plot(feats, "mel")
 
     # for log power spectrogram testing
-    waveforms = torch.from_numpy(waveforms).to(dtype)
-    specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
-    specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
-                                  specs.shape[1])
-    spec_org = kaldi.spectrogram(waveforms,
-                                 raw_energy=False,
-                                 window_type="hanning")
-    spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
-    spec_list = []
-    spec_list.append(specs[0])
-    spec_list.append(spec_org)
-    spec_list = np.stack(spec_list, axis=0)
-    plot(spec_list,
-         "fft", ["Spectrogram", "Spectrogram_Origin"],
-         diff_scale=True)
+    # waveforms = torch.from_numpy(waveforms).to(dtype)
+    # specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
+    # specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
+    #                               specs.shape[1])
+    # spec_org = kaldi.spectrogram(waveforms,
+    #                              raw_energy=False,
+    #                              window_type="hanning")
+    # spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
+    # spec_list = []
+    # spec_list.append(specs[0])
+    # spec_list.append(spec_org)
+    # spec_list = np.stack(spec_list, axis=0)
+    # plot(spec_list,
+    #      "fft", ["Spectrogram", "Spectrogram_Origin"],
+    #      diff_scale=True)
 
     # for infer time testing
     # number = 5
