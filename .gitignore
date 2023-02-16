@@ -1,7 +1,7 @@
 # Customization
-Audio/
-Model/
-Profile/
+Audio
+Model
+Profile
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
