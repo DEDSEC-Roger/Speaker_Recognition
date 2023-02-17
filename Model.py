@@ -211,11 +211,11 @@ class Model(QObject):
                                         norm=None)
             spectrum = torch.from_numpy(strided_input).abs().to(self.dtype)
 
+        if spectrogram:
+            return spectrum
+
         if use_power:
             spectrum = spectrum.pow(2.0)
-
-        if spectrogram:
-            return spectrum.log()
 
         # size (num_mel_bins, padded_window_size // 2)
         mel_energies = self.mel_energies
