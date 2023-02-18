@@ -93,14 +93,15 @@ def profile_test(embeddings: np.array,
 
 
 if "__main__" == __name__:
-    sample_rate = 16000
+    audio = Audio(None, 3)
+    sample_rate = audio.sample_rate
+
     modelname = "ECAPA_TDNN_GLOB_c512-ASTP-emb192-ArcMargin-LM"
     for config in modelname.split('-'):
         if "emb" in config:
             embeding_size = int(config[3:])
-
-    audio = Audio(None, 3)
-    model = Model(None, os.path.join("Model", f"{modelname}.onnx"), sample_rate)
+    model = Model(None, os.path.join("Model", f"{modelname}.onnx"),
+                  audio.sample_rate)
     profile = Profile(None, os.path.join("Profile", f"{modelname}"),
                       embeding_size)
 
@@ -109,6 +110,7 @@ if "__main__" == __name__:
     frame_length = model.frame_length
     frame_shift = model.frame_shift
     dither = model.dither
+    window_type = model.window_type
     high_freq = model.high_freq
     low_freq = model.low_freq
 
@@ -122,7 +124,7 @@ if "__main__" == __name__:
                             frame_shift=frame_shift,
                             dither=dither,
                             sample_frequency=sample_rate,
-                            window_type='hamming',
+                            window_type=window_type,
                             use_energy=False))
 
         return torch.stack(feats, dim=0)
@@ -135,7 +137,7 @@ if "__main__" == __name__:
                            frame_shift=frame_shift,
                            dither=dither,
                            sample_frequency=sample_rate,
-                           window_type='hamming',
+                           window_type=window_type,
                            use_energy=False,
                            spectrogram=spectrogram)
 
@@ -151,6 +153,9 @@ if "__main__" == __name__:
         """
         assert type in ["waveshow", "linear", "fft", "hz", "log", "mel"]
 
+        if isinstance(titles, str):
+            titles = [titles]
+
         if titles is not None:
             n_row = len(titles)
         else:
@@ -160,7 +165,6 @@ if "__main__" == __name__:
                 titles.append(f"{i+1}-th signal")
 
         fig, axs = plt.subplots(nrows=n_row, sharex=True)
-        max_value = np.finfo(signals.dtype).min
         hop_length = int(frame_shift * sample_rate // 1000)
         win_length = int(frame_length * sample_rate // 1000)
         global high_freq
@@ -169,6 +173,7 @@ if "__main__" == __name__:
 
         def helper(signal: np.ndarray, ax, title: str):
             if "waveshow" == type:
+                signal = signal.astype(np.float32)
                 img = librosa.display.waveshow(y=signal,
                                                sr=sample_rate,
                                                x_axis="ms",
@@ -194,6 +199,7 @@ if "__main__" == __name__:
         if 1 == n_row:
             img = helper(signals[0], axs, titles[0])
         else:
+            max_value = np.min(signals)
             for i in range(n_row):
                 temp = helper(signals[i], axs[i], titles[i])
                 value = np.max(signals[i])
@@ -227,17 +233,48 @@ if "__main__" == __name__:
     #         for wav in os.listdir(os.path.join(id_dir, id, video)):
     #             print(wav)
 
-    for filename in os.listdir("Audio"):
-        try:
-            file_path = os.path.join("Audio", f"{filename}")
-            waveforms = load(file_path, sample_rate)
-        except:
-            continue
+    # for filename in os.listdir("Audio"):
+    #     try:
+    #         file_path = os.path.join("Audio", f"{filename}")
+    #         waveforms = load(file_path, sample_rate)
+    #     except:
+    #         continue
 
-        embeddings = infer(model, waveforms)
-        profile_test(embeddings, profile, 2, filename.split('.')[0])
+    #     embeddings = infer(model, waveforms)
+    #     profile_test(embeddings, profile, 2, filename.split('.')[0])
 
-    waveforms = load(r"hzf_enroll.wav", sample_rate)
+    # waveforms = load(r"hzf_enroll.wav", sample_rate)
+    # plot(np.expand_dims(waveforms[0], axis=0), "waveshow", titles="waveform")
+
+    # for spectrogram testing
+    # waveforms = torch.from_numpy(waveforms).to(dtype)
+    # specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
+    # specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
+    #                               specs.shape[1])
+    # spec_org = kaldi.spectrogram(waveforms,
+    #                              raw_energy=False,
+    #                              window_type=window_type)
+    # spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
+
+    # spec_list = []
+    # spec_list.append(specs[0])
+    # spec_list.append(librosa.amplitude_to_db(specs[0]))
+    # spec_list.append(spec_org)
+    # spec_list = np.stack(spec_list, axis=0)
+    # plot(spec_list,
+    #      "hz", ["Spectrogram", "Spectrogram_dB", "log power Spectrogram"],
+    #      diff_scale=True)
+
+    # for mel fbank testing
+    freq = librosa.fft_frequencies(sr=sample_rate, n_fft=512)
+    melfb = librosa.filters.mel(sr=sample_rate,
+                                n_fft=512,
+                                n_mels=model.num_mel_bins,
+                                fmin=20,
+                                norm=None)
+    plt.plot(freq, np.transpose(melfb))
+    plt.title("Mel filter-bank")
+    plt.show()
 
     # for fbank time testing
     # waveforms = torch.from_numpy(waveforms).to(dtype)
@@ -252,23 +289,6 @@ if "__main__" == __name__:
     # feats = feats.numpy().reshape(feats.shape[0], feats.shape[2],
     #                               feats.shape[1])
     # plot(feats, "mel")
-
-    # for log power spectrogram testing
-    # waveforms = torch.from_numpy(waveforms).to(dtype)
-    # specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
-    # specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
-    #                               specs.shape[1])
-    # spec_org = kaldi.spectrogram(waveforms,
-    #                              raw_energy=False,
-    #                              window_type="hanning")
-    # spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
-    # spec_list = []
-    # spec_list.append(specs[0])
-    # spec_list.append(spec_org)
-    # spec_list = np.stack(spec_list, axis=0)
-    # plot(spec_list,
-    #      "fft", ["Spectrogram", "Spectrogram_Origin"],
-    #      diff_scale=True)
 
     # for infer time testing
     # number = 5
