@@ -273,7 +273,7 @@ if "__main__" == __name__:
                                 fmin=20,
                                 norm=None)
     plt.plot(freq, np.transpose(melfb))
-    plt.title("Mel filter-bank")
+    plt.title("Mel-filterbank")
     plt.show()
 
     # for fbank time testing
