@@ -102,6 +102,9 @@ if "__main__" == __name__:
             embeding_size = int(config[3:])
     model = Model(None, os.path.join("Model", f"{modelname}.onnx"),
                   audio.sample_rate)
+    model_resnet = Model(
+        None, os.path.join("Model", f"{'voxceleb-resnet34-emb256-LM'}.onnx"),
+        audio.sample_rate)
     profile = Profile(None, os.path.join("Profile", f"{modelname}"),
                       embeding_size)
 
@@ -266,15 +269,15 @@ if "__main__" == __name__:
     #      diff_scale=True)
 
     # for mel fbank testing
-    freq = librosa.fft_frequencies(sr=sample_rate, n_fft=512)
-    melfb = librosa.filters.mel(sr=sample_rate,
-                                n_fft=512,
-                                n_mels=model.num_mel_bins,
-                                fmin=20,
-                                norm=None)
-    plt.plot(freq, np.transpose(melfb))
-    plt.title("Mel-filterbank")
-    plt.show()
+    # freq = librosa.fft_frequencies(sr=sample_rate, n_fft=512)
+    # melfb = librosa.filters.mel(sr=sample_rate,
+    #                             n_fft=512,
+    #                             n_mels=model.num_mel_bins,
+    #                             fmin=20,
+    #                             norm=None)
+    # plt.plot(freq, np.transpose(melfb))
+    # plt.title("Mel-filterbank")
+    # plt.show()
 
     # for fbank time testing
     # waveforms = torch.from_numpy(waveforms).to(dtype)
@@ -291,11 +294,11 @@ if "__main__" == __name__:
     # plot(feats, "mel")
 
     # for infer time testing
-    # number = 5
-    # print(
-    #     timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
-    #            number=number) / number)
-    # print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
+    number = 5
+    print(
+        timeit(stmt=lambda: infer_origin(model_resnet, waveforms, sample_rate),
+               number=number) / number)
+    print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
     # for infer testing
     # embeddings = infer_origin(model, waveforms, sample_rate)
