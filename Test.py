@@ -243,7 +243,7 @@ if "__main__" == __name__:
     #     embeddings = infer(model, waveforms)
     #     profile_test(embeddings, profile, 2, filename.split('.')[0])
 
-    # waveforms = load(r"hzf_enroll.wav", sample_rate)
+    waveforms = load(r"hzf_enroll.wav", sample_rate)
     # plot(np.expand_dims(waveforms[0], axis=0), "waveshow", titles="waveform")
 
     # for spectrogram testing
