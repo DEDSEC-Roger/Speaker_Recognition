@@ -88,7 +88,7 @@ class MyWidget(QWidget):
         # EER = 1.972
         # thres = 0.31796
         # minDCF (p_target:0.01 c_miss:1 c_fa:1) = 0.194
-        self.recognize_threshold = 0.31796
+        self.recognize_threshold = 0.45377
         self.save_threshold = 0.53752
 
         # audio
