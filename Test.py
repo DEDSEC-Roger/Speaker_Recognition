@@ -280,10 +280,10 @@ if "__main__" == __name__:
     # plt.show()
 
     # for fbank time testing
-    # waveforms = torch.from_numpy(waveforms).to(dtype)
-    # number = 100
-    # print(timeit(stmt=lambda: fbank_origin(waveforms), number=number) / number)
-    # print(timeit(stmt=lambda: fbank(model, waveforms), number=number) / number)
+    waveforms = torch.from_numpy(waveforms).to(dtype)
+    number = 100
+    print(timeit(stmt=lambda: fbank_origin(waveforms), number=number) / number)
+    print(timeit(stmt=lambda: fbank(model, waveforms), number=number) / number)
 
     # for fbank testing
     # waveforms = torch.from_numpy(waveforms).to(dtype)
@@ -294,11 +294,11 @@ if "__main__" == __name__:
     # plot(feats, "mel")
 
     # for infer time testing
-    number = 5
-    print(
-        timeit(stmt=lambda: infer_origin(model_resnet, waveforms, sample_rate),
-               number=number) / number)
-    print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
+    # number = 5
+    # print(
+    #     timeit(stmt=lambda: infer_origin(model_resnet, waveforms, sample_rate),
+    #            number=number) / number)
+    # print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
     # for infer testing
     # embeddings = infer_origin(model, waveforms, sample_rate)
