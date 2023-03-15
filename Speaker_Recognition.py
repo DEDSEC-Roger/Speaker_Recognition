@@ -46,7 +46,7 @@ class MyWidget(QWidget):
         self.delete_text = self.ui.button_delete.text()
         self.auto_text = self.ui.button_auto.text()
         self.cancel_text = "取消"
-        self.keyword = "你好，小P"
+        self.keyword = "你好，BIP"
 
         self.ui.input_username.setPlaceholderText("在此输入用户名")
         self.ui.display_debug.setPlaceholderText("调试信息，用户可忽略。")

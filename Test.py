@@ -296,7 +296,7 @@ if "__main__" == __name__:
     # for infer time testing
     number = 5
     print(
-        timeit(stmt=lambda: infer_origin(model_resnet, waveforms, sample_rate),
+        timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
                number=number) / number)
     print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
