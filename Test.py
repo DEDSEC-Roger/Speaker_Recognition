@@ -18,7 +18,7 @@ from Model import Model
 from Profile import Profile
 
 
-def load(file_path: str, sample_rate: int, duration: int = 2):
+def load(file_path: str, sample_rate: int, duration: int = 2, whole_utt=False):
     """
     file_path: str
     sample_rate: int
@@ -27,6 +27,10 @@ def load(file_path: str, sample_rate: int, duration: int = 2):
     return: np.array with shape [bs, sample_rate * duration]
     """
     waveform = audio.load(file_path)
+
+    if whole_utt:
+        return np.expand_dims(waveform, axis=0)
+
     length = sample_rate * duration
     waveforms = []
     for i in range(len(waveform) // length):
@@ -246,27 +250,31 @@ if "__main__" == __name__:
     #     embeddings = infer(model, waveforms)
     #     profile_test(embeddings, profile, 2, filename.split('.')[0])
 
+    # waveforms = load(
+    #     r"D:\Graduate\Voice\Model\dcase2020\dev\ToyCar\train\normal_id_01_00000001.wav",
+    #     sample_rate,
+    #     whole_utt=True)
     waveforms = load(r"hzf_enroll.wav", sample_rate)
     # plot(np.expand_dims(waveforms[0], axis=0), "waveshow", titles="waveform")
 
     # for spectrogram testing
-    # waveforms = torch.from_numpy(waveforms).to(dtype)
-    # specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
-    # specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
-    #                               specs.shape[1])
-    # spec_org = kaldi.spectrogram(waveforms,
-    #                              raw_energy=False,
-    #                              window_type=window_type)
-    # spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
+    waveforms = torch.from_numpy(waveforms).to(dtype)
+    specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
+    specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
+                                  specs.shape[1])
+    spec_org = kaldi.spectrogram(waveforms,
+                                 raw_energy=False,
+                                 window_type=window_type)
+    spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
 
-    # spec_list = []
-    # spec_list.append(specs[0])
-    # spec_list.append(librosa.amplitude_to_db(specs[0]))
-    # spec_list.append(spec_org)
-    # spec_list = np.stack(spec_list, axis=0)
-    # plot(spec_list,
-    #      "hz", ["Spectrogram", "Spectrogram_dB", "log power Spectrogram"],
-    #      diff_scale=True)
+    spec_list = []
+    spec_list.append(specs[0])
+    spec_list.append(librosa.amplitude_to_db(specs[0]))
+    spec_list.append(spec_org)
+    spec_list = np.stack(spec_list, axis=0)
+    plot(spec_list,
+         "hz", ["Spectrogram", "Spectrogram_dB", "log power Spectrogram"],
+         diff_scale=True)
 
     # for mel fbank testing
     # freq = librosa.fft_frequencies(sr=sample_rate, n_fft=512)
@@ -294,11 +302,11 @@ if "__main__" == __name__:
     # plot(feats, "mel")
 
     # for infer time testing
-    number = 5
-    print(
-        timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
-               number=number) / number)
-    print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
+    # number = 5
+    # print(
+    #     timeit(stmt=lambda: infer_origin(model, waveforms, sample_rate),
+    #            number=number) / number)
+    # print(timeit(stmt=lambda: infer(model, waveforms), number=number) / number)
 
     # for infer testing
     # embeddings = infer_origin(model, waveforms, sample_rate)
