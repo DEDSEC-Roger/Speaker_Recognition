@@ -254,7 +254,7 @@ if "__main__" == __name__:
     #     r"D:\Graduate\Voice\Model\dcase2020\dev\ToyCar\train\normal_id_01_00000001.wav",
     #     sample_rate,
     #     whole_utt=True)
-    waveforms = load(r"hzf_enroll.wav", sample_rate)
+    waveforms = load(r"id_01_00000000.wav", sample_rate)
     # plot(np.expand_dims(waveforms[0], axis=0), "waveshow", titles="waveform")
 
     # for spectrogram testing
