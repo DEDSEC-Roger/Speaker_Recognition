@@ -258,23 +258,23 @@ if "__main__" == __name__:
     # plot(np.expand_dims(waveforms[0], axis=0), "waveshow", titles="waveform")
 
     # for spectrogram testing
-    waveforms = torch.from_numpy(waveforms).to(dtype)
-    specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
-    specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
-                                  specs.shape[1])
-    spec_org = kaldi.spectrogram(waveforms,
-                                 raw_energy=False,
-                                 window_type=window_type)
-    spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
+    # waveforms = torch.from_numpy(waveforms).to(dtype)
+    # specs = fbank(model, waveforms[0].unsqueeze(0), spectrogram=True)
+    # specs = specs.numpy().reshape(specs.shape[0], specs.shape[2],
+    #                               specs.shape[1])
+    # spec_org = kaldi.spectrogram(waveforms,
+    #                              raw_energy=False,
+    #                              window_type=window_type)
+    # spec_org = spec_org.numpy().reshape(spec_org.shape[1], spec_org.shape[0])
 
-    spec_list = []
-    spec_list.append(specs[0])
-    spec_list.append(librosa.amplitude_to_db(specs[0]))
-    spec_list.append(spec_org)
-    spec_list = np.stack(spec_list, axis=0)
-    plot(spec_list,
-         "hz", ["Spectrogram", "Spectrogram_dB", "log power Spectrogram"],
-         diff_scale=True)
+    # spec_list = []
+    # spec_list.append(specs[0])
+    # spec_list.append(librosa.amplitude_to_db(specs[0]))
+    # spec_list.append(spec_org)
+    # spec_list = np.stack(spec_list, axis=0)
+    # plot(spec_list,
+    #      "hz", ["Spectrogram", "Spectrogram_dB", "log power Spectrogram"],
+    #      diff_scale=True)
 
     # for mel fbank testing
     # freq = librosa.fft_frequencies(sr=sample_rate, n_fft=512)
@@ -288,10 +288,10 @@ if "__main__" == __name__:
     # plt.show()
 
     # for fbank time testing
-    # waveforms = torch.from_numpy(waveforms).to(dtype)
-    # number = 100
-    # print(timeit(stmt=lambda: fbank_origin(waveforms), number=number) / number)
-    # print(timeit(stmt=lambda: fbank(model, waveforms), number=number) / number)
+    waveforms = torch.from_numpy(waveforms).to(dtype)
+    number = 100
+    print(timeit(stmt=lambda: fbank_origin(waveforms), number=number) / number)
+    print(timeit(stmt=lambda: fbank(model, waveforms), number=number) / number)
 
     # for fbank testing
     # waveforms = torch.from_numpy(waveforms).to(dtype)
@@ -299,7 +299,7 @@ if "__main__" == __name__:
     # feats = fbank(model, waveforms)
     # feats = feats.numpy().reshape(feats.shape[0], feats.shape[2],
     #                               feats.shape[1])
-    # plot(feats, "mel")
+    # plot(feats, "mel", titles=["LFBE", "LFBE", "LFBE"], diff_scale=True)
 
     # for infer time testing
     # number = 5
